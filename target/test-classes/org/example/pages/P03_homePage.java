@@ -118,12 +118,12 @@ public class P03_homePage {
         return  Hooks.driver.findElements(By.cssSelector("ul.top-menu.notmobile > li > a"));
 
     }
-
+    int selectedCategory;
     public WebElement getRandomfromCategories(List<WebElement> Categories)
     {
     int min = 0;
-    int max = 2;
-    int selectedCategory = (int)Math.floor((Math.random()*(max-min+1))+min);
+    int max = 6;
+     this.selectedCategory = (int)Math.floor((Math.random()*(max-min+1))+min);
         System.out.println("selectedCategory : " + selectedCategory);
     this.category = selectedCategory + 1;
         System.out.println("Selected Category : "+ getCategories().get(selectedCategory).getText() );
@@ -161,21 +161,31 @@ public class P03_homePage {
     public void clickRandomSubCategory()
     {
        List<WebElement> subCategories = Hooks.driver.findElements(By.cssSelector("ul.top-menu.notmobile > li:nth-child("+this.category+") > ul > li >a"));
-        System.out.println("subCategories : "+subCategories.size());
-        System.out.println("sub1 : "+subCategories.get(0).getText());
-        System.out.println("sub2 : "+subCategories.get(1).getText());
-        System.out.println("sub3 : "+subCategories.get(2).getText());
 
-        int min = 0;
-        int max = 2;
-        int selectedSubCategory = (int)Math.floor(Math.random()*(max-min+1)+min);
-        this.subCategories = selectedSubCategory + 1;
+//       System.out.println("subCategories : "+subCategories.size());
+//        System.out.println("sub1 : "+subCategories.get(0).getText());
+//        System.out.println("sub2 : "+subCategories.get(1).getText());
+//        System.out.println("sub3 : "+subCategories.get(2).getText());
 
-        System.out.println("subCategorys : "+subCategories.get(selectedSubCategory).getText());
-        this.selectedSubCategory =subCategories.get(selectedSubCategory).getText();
+        if(subCategories.size() > 0) {
+            int min = 0;
+            int max = 2;
+            int selectedSubCategory = (int) Math.floor(Math.random() * (max - min + 1) + min);
+            this.subCategories = selectedSubCategory + 1;
 
-        subCategories.get(selectedSubCategory).click();
+            System.out.println("subCategorys : " + subCategories.get(selectedSubCategory).getText());
+            this.selectedSubCategory = subCategories.get(selectedSubCategory).getText();
 
+            subCategories.get(selectedSubCategory).click();
+        }
+        else
+        {
+            System.out.println("Selected Category : "+ getCategories().get(this.selectedCategory).getText() );
+            getCategories().get(this.selectedCategory).click();
+            this.selectedSubCategory = getCategories().get(this.selectedCategory).getText(); // if there is no subcategory make category text as sub
+
+
+        }
 
 
 
