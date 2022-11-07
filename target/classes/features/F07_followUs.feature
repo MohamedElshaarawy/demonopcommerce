@@ -3,7 +3,6 @@
     Scenario: user opens facebook link
       Given user click facebook link
       Then "https://www.facebook.com/nopCommerce" is opened in new tab
-
     Scenario: user opens twitter link
     Given user click twitter link
     Then "https://twitter.com/nopCommerce" is opened in new tab
