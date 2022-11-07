@@ -1,7 +1,5 @@
 package org.example.pages;
 
-import io.cucumber.core.backend.HookDefinition;
-import io.cucumber.messages.types.Hook;
 import org.example.stepDefs.Hooks;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -15,11 +13,12 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class P03_homePage {
 
-
+    int category;
+    String selectedSubCategory;
+    int subCategories;
     public List<WebElement> getPrices()
     {
         return Hooks.driver.findElements(By.cssSelector("span.price"));
@@ -114,40 +113,114 @@ public class P03_homePage {
     }
 
     public List<WebElement> getCategories(){
-
+        System.out.println(Hooks.driver.findElements(By.cssSelector("ul.top-menu.notmobile > li > a")).size());
 
         return  Hooks.driver.findElements(By.cssSelector("ul.top-menu.notmobile > li > a"));
 
     }
-
-    public int getRandomfromCategories(List<WebElement> Categories)
+    int selectedCategory;
+    public WebElement getRandomfromCategories(List<WebElement> Categories)
     {
     int min = 0;
-    int max = 2;
-    int selectedCategory = (int)Math.floor(Math.random()*(max-min+1)+min);
-      return   selectedCategory;
+    int max = 6;
+     this.selectedCategory = (int)Math.floor((Math.random()*(max-min+1))+min);
+        System.out.println("selectedCategory : " + selectedCategory);
+    this.category = selectedCategory + 1;
+        System.out.println("Selected Category : "+ getCategories().get(selectedCategory).getText() );
+      return   getCategories().get(selectedCategory);
     }
 
-    public void hooverSelectedCategoryAndGetText(WebElement selectedCategory)
+//    public List<WebElement> getSubCategories(){
+//        return getCategories().get(this.category-1).findElements();
+//        return null;
+//    }
+
+
+//    public int getRandomfromSubCategories(List<WebElement> subCategories)
+//    {
+//    int min = 0;
+//    int max = 2;
+//    int selectedSubCategory = (int)Math.floor(Math.random()*(max-min+1)+min);
+//    this.subCategories = selectedSubCategory + 1;
+//      return   selectedSubCategory + 1;
+//    }
+
+    public void hooverSelectedCategory()
     {
-        Actions actions = new Actions(Hooks.driver);
-        WebElement selectedElement = Hooks.driver.findElement(By.cssSelector("ul.top-menu.notmobile > li:nth-child("+getRandomfromCategories(getCategories())+") > a"));
-        actions.moveToElement(selectedElement).perform();
+       Actions actions = new Actions(Hooks.driver);
+       WebElement selectedElement = Hooks.driver.findElement(By.cssSelector("ul.top-menu.notmobile > li:nth-child("+this.category+") > a"));
+       actions.moveToElement(selectedElement).perform();
 
     }
 
-    public List<WebElement> getSubCategories(int category)
-    {
-        int selectedCategory = category+1;
-       List<WebElement> subCategories = Hooks.driver.findElements(By.cssSelector("ul.top-menu.notmobile > li:nth-child("+category+") > ul > li"));
 
-        if(subCategories.isEmpty()) {
-            return null;
+    public String getSelectedSubCategoryText(){
+        return this.selectedSubCategory.toLowerCase().trim();
+    }
+
+    public void clickRandomSubCategory()
+    {
+       List<WebElement> subCategories = Hooks.driver.findElements(By.cssSelector("ul.top-menu.notmobile > li:nth-child("+this.category+") > ul > li >a"));
+
+//       System.out.println("subCategories : "+subCategories.size());
+//        System.out.println("sub1 : "+subCategories.get(0).getText());
+//        System.out.println("sub2 : "+subCategories.get(1).getText());
+//        System.out.println("sub3 : "+subCategories.get(2).getText());
+
+        if(subCategories.size() > 0) {
+            int min = 0;
+            int max = 2;
+            int selectedSubCategory = (int) Math.floor(Math.random() * (max - min + 1) + min);
+            this.subCategories = selectedSubCategory + 1;
+
+            System.out.println("subCategorys : " + subCategories.get(selectedSubCategory).getText());
+            this.selectedSubCategory = subCategories.get(selectedSubCategory).getText();
+
+            subCategories.get(selectedSubCategory).click();
         }
-        else  return  subCategories;
+        else
+        {
+            System.out.println("Selected Category : "+ getCategories().get(this.selectedCategory).getText() );
+            getCategories().get(this.selectedCategory).click();
+            this.selectedSubCategory = getCategories().get(this.selectedCategory).getText(); // if there is no subcategory make category text as sub
+
+
+        }
+
+
 
     }
-    public void clickSubCategory(){}
+     public String getPageTitle()
+     {
+         WebDriverWait wait = new WebDriverWait(Hooks.driver,Duration.ofSeconds(5));
+         WebElement pageTitle = Hooks.driver.findElement(By.cssSelector("div.page-title > h1"));
+         wait.until(ExpectedConditions.visibilityOf(pageTitle));
+        return pageTitle.getText().toLowerCase().trim();
+     }
+
+//    public void clickRandomSubCategory(List<WebElement> subCategories) throws InterruptedException {
+//
+//        if(subCategories.isEmpty())
+//        {
+//            Hooks.driver.findElement(By.cssSelector("ul.top-menu.notmobile > li:nth-child("+this.category+") > a")).click();
+//        }
+//        else
+//        {
+//            this.subCategories = getRandomfromCategories(getSubCategories());
+//            WebDriverWait wait = new WebDriverWait(Hooks.driver, Duration.ofSeconds(5));
+//            WebElement sub = Hooks.driver.findElement(By.cssSelector("ul.top-menu.notmobile > li:nth-child("+this.category +") > ul > li:nth-child("
+//                    +this.subCategories+") > a"));
+//            System.out.println("selected Sub "+ this.subCategories + "selected main " + category);
+//            wait.until(ExpectedConditions.elementToBeClickable(sub));
+//            sub.click();
+//
+//
+//
+//        }
+//
+//    }
+
+
 
 
     public void clickFirstBanner() throws InterruptedException {
@@ -222,9 +295,9 @@ public class P03_homePage {
         Thread.sleep(5000);
         String stringText = Hooks.driver.findElement(By.cssSelector("span[class=\"wishlist-qty\"]")).getText();
 
-        var removedbracesText =stringText.replaceAll("[\\[\\](){}]","");
+        var removedBracesText =stringText.replaceAll("[\\[\\](){}]","");
 
-        return Integer.parseInt(removedbracesText);
+        return Integer.parseInt(removedBracesText);
 
 
     }
